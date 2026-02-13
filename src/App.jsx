@@ -16,9 +16,9 @@ function App() {
         
         {/* <LoveCard/> */}
         {/* <LoveApp/> */}
-        {/* <LoveProposal/> */}
+        <LoveProposal/>
         {/* <ValentineCard/> */}
-        <AdvancedLoveTerminal/>
+        {/* <AdvancedLoveTerminal/> */}
           {/* <ValentineApp/> */}
 
 

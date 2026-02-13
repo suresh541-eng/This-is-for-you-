@@ -4,247 +4,204 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Typewriter } from "react-simple-typewriter";
 
 const LoveProposal = () => {
-  // Password protection
-  const SECRET_PASSWORD = "june-24"; // change this
+  const SECRET_PASSWORD = "june-24"; 
   const [unlocked, setUnlocked] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
-  // General states
   const [name, setName] = useState("");
   const [step, setStep] = useState(0);
   const [accepted, setAccepted] = useState(false);
-  const [dark, setDark] = useState(false);
-  const [musicOn, setMusicOn] = useState(false);
-  const [noPos, setNoPos] = useState({ top: "60%", left: "55%" });
+  const [noPos, setNoPos] = useState({ top: "50%", left: "60%" });
   const [imgIndex, setImgIndex] = useState(0);
   const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
 
-  const audioRef = useRef(null);
+  const images = [
+    "/Haritha4.jpeg", // Replace with /Haritha4.jpeg
+    "/haritha1.jpeg", // Replace with /haritha1.jpeg
+    "/haritha3.jpeg" , // Replace with /haritha3.jpeg
+    "/haritha2.jpeg"
+  ];
+  const proposalDate = "31 August 2025";
 
-  const images = ["/Haritha4.jpeg", "/haritha1.jpeg", "/haritha3.jpeg", "/haritha2.jpeg"]; // customize
-  const proposalDate = "31 Augest 2025"; // customize
-
-  // Initialize audio
   useEffect(() => {
-    audioRef.current = new Audio("/music/love.mp3");
-    audioRef.current.loop = true;
+    const handleResize = () => setSize({ width: window.innerWidth, height: window.innerHeight });
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Window resize for Confetti
   useEffect(() => {
-    const resize = () => setSize({ width: window.innerWidth, height: window.innerHeight });
-    window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
-  }, []);
-
-  // Memory slideshow
-  useEffect(() => {
-    if (step >= 1) {
-      const timer = setInterval(() => setImgIndex((i) => (i + 1) % images.length), 2500);
+    if (step === 1) {
+      const timer = setInterval(() => setImgIndex((i) => (i + 1) % images.length), 3000);
       return () => clearInterval(timer);
     }
   }, [step]);
 
-  // Music toggle
-  const toggleMusic = () => {
-    if (!musicOn) audioRef.current.play();
-    else audioRef.current.pause();
-    setMusicOn(!musicOn);
-  };
-
-  // NO button move
-  const moveNo = () => setNoPos({ top: Math.random() * 75 + "%", left: Math.random() * 75 + "%" });
-
-  // Check password
   const checkPassword = () => {
-    if (password === SECRET_PASSWORD) {
+    if (password.toLowerCase() === SECRET_PASSWORD) {
       setUnlocked(true);
       setError("");
-    } else setError("Hmm… idi correct kaadu 🙈");
+    } else {
+      setError("Hmm… adi correct kaadu 🙈");
+    }
+  };
+
+  const moveNo = () => {
+    const randomTop = Math.random() * 80 + 10;
+    const randomLeft = Math.random() * 80 + 10;
+    setNoPos({ top: `${randomTop}%`, left: `${randomLeft}%` });
   };
 
   return (
-    <div className={`container ${dark ? "dark" : ""}`}>
-      {/* Floating Hearts */}
-      <div className="hearts">
-        {[...Array(20)].map((_, i) => (
-          <span key={i} className="heart" style={{ left: `${Math.random() * 100}%` }}>❤️</span>
+    <div className="min-h-screen bg-gradient-to-br from-rose-100 via-red-50 to-pink-200 flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
+      
+      {/* Background Floating Hearts Animation */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(15)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ y: "100vh", opacity: 0 }}
+            animate={{ y: "-10vh", opacity: [0, 1, 0] }}
+            transition={{ duration: Math.random() * 5 + 5, repeat: Infinity, delay: Math.random() * 5 }}
+            className="absolute text-2xl"
+            style={{ left: `${Math.random() * 100}%` }}
+          >
+            ❤️
+          </motion.div>
         ))}
       </div>
 
-      {/* Top Controls */}
-      {unlocked && (
-        <div className="topControls">
-          
-          <button onClick={() => setDark(!dark)}>{dark ? "☀️ Light" : "🌙 Dark"}</button>
-        </div>
-      )}
-
-      <AnimatePresence>
-        {/* PASSWORD SCREEN */}
+      <AnimatePresence mode="wait">
+        {/* --- PASSWORD SCREEN --- */}
         {!unlocked && (
-          <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }}>
-            <h1 className="heading">🔒 Secret Page</h1>
-            <p className="message">
-              Ee page open cheyyalante<br />manaki maatrame telisina password kavali 💕
-            </p>
+          <motion.div 
+            key="unlock"
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-white/80 backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-white w-full max-w-sm text-center z-10"
+          >
+            <div className="text-5xl mb-4">🔒</div>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">Secret Access</h1>
+            <p className="text-gray-600 mb-6 text-sm">Meeku maatrame telisina password enter cheyyandi 💕</p>
             <input
-              className="input"
               type="password"
-              placeholder="Enter password"
+              className="w-full p-3 border-2 border-pink-200 rounded-xl focus:outline-none focus:border-pink-500 transition-all text-center mb-4"
+              placeholder="Password ikkada..."
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button className="button" onClick={checkPassword}>Unlock 💖</button>
-            {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+            <button onClick={checkPassword} className="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-xl shadow-lg transition-transform active:scale-95">
+              Unlock Memories 💖
+            </button>
+            {error && <p className="text-red-500 text-xs mt-3 font-medium animate-bounce">{error}</p>}
           </motion.div>
         )}
 
-        {/* STEP 0: Enter Name */}
+        {/* --- STEP 0: NAME --- */}
         {unlocked && step === 0 && (
-          <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }}>
-            <h1 className="heading">Hey 💖</h1>
+          <motion.div 
+            key="step0"
+            initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, x: -100 }}
+            className="bg-white/70 backdrop-blur-lg p-10 rounded-[2rem] shadow-2xl border border-white text-center z-10"
+          >
+            <h1 className="text-4xl mb-6 text-rose-600 font-serif italic font-bold text-shadow">Namaste! ✨</h1>
             <input
-              className="input"
-              placeholder="Enter your name"
+              className="w-full p-4 text-lg border-b-4 border-rose-300 focus:border-rose-500 outline-none bg-transparent text-center mb-8"
+              placeholder="Mee peru cheppandi..."
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-            <button className="button" disabled={!name} onClick={() => setStep(1)}>Continue</button>
+            <button 
+              disabled={!name} 
+              onClick={() => setStep(1)}
+              className="px-10 py-3 bg-rose-500 text-white rounded-full font-bold shadow-xl hover:bg-rose-600 disabled:bg-gray-300 transition-all"
+            >
+              Start Magic ✨
+            </button>
           </motion.div>
         )}
 
-        {/* STEP 1: Memory Slideshow + Typewriter */}
+        {/* --- STEP 1: SLIDESHOW --- */}
         {unlocked && step === 1 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <img src={images[imgIndex]} className="memoryImage" alt="memory" />
-            <p className="message">
-              <Typewriter
-                words={[
-                  `Hey ${name} 💕`,
-                  "Naa life lo nuvvu chala special…",
-                  "Naa heart nunchi oka question 💍"
-                ]}
-                loop={1}
-                cursor
-                typeSpeed={50}
-                delaySpeed={1200}
-              />
-            </p>
-            <button className="button" onClick={() => setStep(2)}>Next →</button>
+          <motion.div 
+            key="step1"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="flex flex-col items-center z-10 max-w-lg w-full"
+          >
+            <div className="relative group mb-8">
+               <div className="absolute -inset-1 bg-gradient-to-r from-rose-400 to-pink-500 rounded-2xl blur opacity-40 group-hover:opacity-100 transition duration-1000"></div>
+               <img src={images[imgIndex]} className="relative w-64 h-64 md:w-80 md:h-80 rounded-2xl object-cover shadow-2xl border-4 border-white" alt="memory" />
+            </div>
+            
+            <div className="h-24 text-center">
+              <p className="text-2xl md:text-3xl font-medium text-rose-700 leading-relaxed italic">
+                <Typewriter
+                  words={[`Hey ${name} 💕`, "Nuvvante naku chala ishtam...", "Mana memories chala sweet...", "Oka chinna vishayam adagali..."]}
+                  loop={1} cursor cursorStyle='|' typeSpeed={70} deleteSpeed={50} delaySpeed={1500}
+                />
+              </p>
+            </div>
+            <button onClick={() => setStep(2)} className="mt-10 px-12 py-3 bg-white text-rose-500 rounded-full font-bold shadow-lg hover:shadow-2xl transition-all">
+              Next →
+            </button>
           </motion.div>
         )}
 
-        {/* STEP 2: Proposal */}
+        {/* --- STEP 2: PROPOSAL --- */}
         {unlocked && step === 2 && !accepted && (
-          <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }}>
-            <h2 className="question">Will you be my forever? 💍</h2>
-            <div className="actions">
-              <button className="yesBtn" onClick={() => setAccepted(true)}>YES 💖</button>
-              <button className="noBtn" style={{ top: noPos.top, left: noPos.left }} onMouseEnter={moveNo}>NO 🙈</button>
+          <motion.div 
+            key="step2"
+            initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+            className="text-center z-10"
+          >
+            <h2 className="text-4xl md:text-6xl font-serif font-bold text-rose-600 mb-12 drop-shadow-md">
+              Will you be my <br/> forever? 💍
+            </h2>
+            <div className="flex justify-center items-center gap-8 min-h-[200px] w-full max-w-md relative">
+              <button 
+                className="z-20 px-10 py-4 bg-green-500 text-white text-xl rounded-full font-extrabold shadow-green-200 shadow-2xl hover:bg-green-600 hover:scale-110 transition-all"
+                onClick={() => setAccepted(true)}
+              >
+                YES! 💖
+              </button>
+              <button 
+                className="absolute z-10 px-8 py-3 bg-gray-400/50 text-white rounded-full font-bold backdrop-blur-sm transition-all duration-75"
+                style={{ top: noPos.top, left: noPos.left }}
+                onMouseEnter={moveNo}
+                onClick={moveNo} // For mobile touch
+              >
+                NO 🙈
+              </button>
             </div>
           </motion.div>
         )}
 
-        {/* FINAL ACCEPTED */}
+        {/* --- FINAL: SUCCESS --- */}
         {unlocked && accepted && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Confetti width={size.width} height={size.height} />
+          <motion.div 
+            key="success"
+            initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }}
+            className="text-center z-20 bg-white/40 backdrop-blur-xl p-10 rounded-[3rem] border border-white/50 shadow-2xl"
+          >
+            <Confetti width={size.width} height={size.height} numberOfPieces={200} gravity={0.1} colors={['#f43f5e', '#fb7185', '#fff']} />
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1.4 }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="ring"
+              animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-9xl mb-6"
             >
               💍
             </motion.div>
-            <h1 className="heading">She said YES 💖</h1>
-            <p className="message">{name}, I promise to love, respect & stand by you forever 💕<br /> ee roju naa life lo marchipoleni roju ❤️</p>
-            <div className="memoryCard">
-              <h2>📅 {proposalDate}</h2>
-              <p>Ee roju nunchi mana story officially start ayyindi 💕 <br />Forever starts here 😘</p>
+            <h1 className="text-4xl md:text-5xl font-black text-rose-600 mb-4 animate-pulse uppercase tracking-tighter">She said YES! 💖</h1>
+            <p className="text-lg text-rose-800 max-w-sm mx-auto mb-8 font-medium italic">
+              "{name}, I promise to love, respect & stand by you forever 💕 ."
+            </p>
+            
+            <div className="bg-gradient-to-r from-rose-500 to-pink-500 text-white p-6 rounded-2xl shadow-inner inline-block transform -rotate-2">
+              <h2 className="text-xl font-bold">📅 {proposalDate}</h2>
+              <p className="text-sm opacity-90">It started from here 😘</p>
+              <p className="mt-2 font-mono text-xs">HARITHA 😊</p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* CSS */}
-      <style>{`
-        .container {
-          min-height: 100vh;
-          background: #ffe6eb;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          padding: 20px;
-          position: relative;
-          overflow: hidden;
-          font-family: Segoe UI, sans-serif;
-        }
-
-        .dark {
-          background: #0f0f0f;
-          color: #fff;
-        }
-
-        .dark .heading,
-        .dark .message {
-          color: #ff7aa2;
-        }
-
-        .topControls {
-          position: absolute;
-          top: 15px;
-          right: 15px;
-          display: flex;
-          gap: 10px;
-          z-index: 10;
-        }
-
-        .topControls button {
-          border: none;
-          background: #ff3366;
-          color: #fff;
-          padding: 8px 14px;
-          border-radius: 20px;
-          cursor: pointer;
-        }
-
-        .hearts {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-        }
-
-        .heart {
-          position: absolute;
-          bottom: -20px;
-          animation: float 6s infinite;
-          font-size: 22px;
-        }
-
-        @keyframes float {
-          0% { transform: translateY(0); opacity: 0; }
-          20% { opacity: 1; }
-          100% { transform: translateY(-100vh); opacity: 0; }
-        }
-
-        .heading { font-size: 42px; color: #ff3366; }
-        .message { font-size: 22px; max-width: 520px; margin: 20px auto; color: #cc0052; }
-        .question { color: #ff3366; }
-        .input { padding: 12px; font-size: 18px; border-radius: 10px; border: 1px solid #ff99aa; }
-        .button { margin-top: 20px; padding: 12px 28px; font-size: 18px; border-radius: 25px; border: none; background: #ff3366; color: #fff; cursor: pointer; }
-        .memoryImage { width: 220px; height: 220px; border-radius: 16px; object-fit: cover; margin-bottom: 20px; }
-        .actions { position: relative; width: 100%; height: 200px; }
-        .yesBtn { padding: 12px 24px; font-size: 18px; border-radius: 25px; background: #ff3366; color: #fff; border: none; }
-        .noBtn { position: absolute; padding: 12px 24px; border-radius: 25px; background: #ccc; border: none; cursor: pointer; }
-        .ring { font-size: 80px; margin-bottom: 10px; }
-        .memoryCard { margin-top: 20px; padding: 20px; border-radius: 16px; background: rgba(255,255,255,0.85); color: #cc0052; max-width: 420px; }
-        .dark .memoryCard { background: rgba(0,0,0,0.6); color: #ff9bb5; }
-      `}</style>
     </div>
   );
 };
