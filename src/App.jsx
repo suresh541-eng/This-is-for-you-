@@ -18,8 +18,8 @@ function App() {
         {/* <LoveApp/> */}
         {/* <LoveProposal/> */}
         {/* <ValentineCard/> */}
-        {/* <AdvancedLoveTerminal/> */}
-          <ValentineApp/>
+        <AdvancedLoveTerminal/>
+          {/* <ValentineApp/> */}
 
 
 
